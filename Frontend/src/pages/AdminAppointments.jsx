@@ -32,9 +32,15 @@ export default function AdminAppointments() {
             <p>Date: {new Date(a.appointmentDate).toLocaleString()}</p>
             <p>Status: {a.status}</p>
 
-            <button onClick={() => updateStatus(a.id, "confirmed")}>Confirm</button>
+            {a.status === "pending" ? (
+              <>
+                <button onClick={() => updateStatus(a.id, "confirmed")}>Confirm</button>
 
-            <button onClick={() => updateStatus(a.id, "cancelled")}>Cancel</button>
+                <button onClick={() => updateStatus(a.id, "cancelled")}>Cancel</button>
+              </>
+            ) : (
+              <p>No action needed</p>
+            )}
           </div>
         ))}
       </div>

@@ -54,6 +54,20 @@ const createAppointment = async (req, res) => {
         message: "This time slot is already booked. Please choose another.",
       });
     }
+    const existingAppointment = await Appointment.findOne({
+      where: {
+        providerId,
+        appointmentDate,
+        appointmentTime,
+        status: "confirmed",
+      },
+    });
+
+    if (existingAppointment) {
+      return res.status(400).json({
+        message: "This time slot is already booked",
+      });
+    }
 
     const appointment = await Appointment.create({
       userId: req.user.id,

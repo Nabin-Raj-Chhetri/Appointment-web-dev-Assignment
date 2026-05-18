@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-
+import Footer from "./components/Footer";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
@@ -12,6 +12,8 @@ import AdminAppointments from "./pages/AdminAppointments";
 import AdminServices from "./pages/AdminServices";
 import AdminContacts from "./pages/AdminContacts";
 import AdminProviders from "./pages/AdminProviders";
+
+import Profile from "./pages/Profile";
 
 import BookProviders from "./pages/BookProviders";
 
@@ -116,6 +118,15 @@ export default function App() {
         />
 
         <Route
+          path="/profile"
+          element={
+            <PrivateRoute>
+              <Profile />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
           path="/admin/providers"
           element={
             <AdminRoute>
@@ -133,6 +144,7 @@ export default function App() {
           }
         />
       </Routes>
+      <Footer />
     </BrowserRouter>
   );
 }

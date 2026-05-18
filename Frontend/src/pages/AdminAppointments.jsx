@@ -91,14 +91,14 @@ export default function AdminAppointments() {
                   {a.status === "pending" && (
                     <>
                       <button
-                        onClick={() => updateStatus(a._id, "confirmed")}
+                        onClick={() => updateStatus(a.id, "confirmed")}
                         className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
                       >
                         Confirm
                       </button>
 
                       <button
-                        onClick={() => updateStatus(a._id, "cancelled")}
+                        onClick={() => updateStatus(a.id, "cancelled")}
                         className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
                       >
                         Cancel

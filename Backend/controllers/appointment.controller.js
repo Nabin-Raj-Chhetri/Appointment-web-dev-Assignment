@@ -2,10 +2,7 @@ const { Op } = require("sequelize");
 const { Appointment, Service, Provider, User } = require("../models");
 
 // Reusable include config for joins
-const appointmentIncludes = [
-  { model: Service, as: "service", attributes: ["id", "name", "durationMinutes"] },
-  { model: Provider, as: "provider", attributes: ["id", "name", "specialisation"] },
-];
+const appointmentIncludes = [{ model: Provider, as: "provider", attributes: ["id", "name", "specialisation"] }];
 
 // ── GET /api/appointments ───────────────────────────────────
 const getMyAppointments = async (req, res) => {
@@ -38,9 +35,14 @@ const getAppointment = async (req, res) => {
 // ── POST /api/appointments ──────────────────────────────────
 const createAppointment = async (req, res) => {
   try {
-    const { serviceId, providerId, appointmentDate, notes } = req.body;
+    const { providerId, appointmentDate, notes } = req.body;
 
-    // Check for conflicting booking (same provider + same date/time, not cancelled)
+    if (!providerId || !appointmentDate) {
+      return res.status(400).json({
+        message: "Provider and appointment date are required",
+      });
+    }
+
     const conflict = await Appointment.findOne({
       where: {
         providerId,
@@ -54,35 +56,23 @@ const createAppointment = async (req, res) => {
         message: "This time slot is already booked. Please choose another.",
       });
     }
-    const existingAppointment = await Appointment.findOne({
-      where: {
-        providerId,
-        appointmentDate,
-        appointmentTime,
-        status: "confirmed",
-      },
-    });
-
-    if (existingAppointment) {
-      return res.status(400).json({
-        message: "This time slot is already booked",
-      });
-    }
 
     const appointment = await Appointment.create({
       userId: req.user.id,
-      serviceId,
       providerId,
       appointmentDate,
       notes: notes || "",
+      status: "pending",
     });
 
-    // Return with joins
     const populated = await Appointment.findByPk(appointment.id, {
       include: appointmentIncludes,
     });
 
-    res.status(201).json({ message: "Appointment booked successfully", appointment: populated });
+    res.status(201).json({
+      message: "Appointment request submitted successfully",
+      appointment: populated,
+    });
   } catch (error) {
     res.status(500).json({ message: "Server error", error: error.message });
   }

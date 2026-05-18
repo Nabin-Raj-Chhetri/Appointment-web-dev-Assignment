@@ -11,6 +11,9 @@ import AdminDashboard from "./pages/AdminDashboard";
 import AdminAppointments from "./pages/AdminAppointments";
 import AdminServices from "./pages/AdminServices";
 import AdminContacts from "./pages/AdminContacts";
+import AdminProviders from "./pages/AdminProviders";
+
+import BookProviders from "./pages/BookProviders";
 
 import Navbar from "./components/Navbar";
 import "./style.css";
@@ -71,6 +74,15 @@ export default function App() {
           path="/book"
           element={
             <PrivateRoute>
+              <BookProviders />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/book/:providerId"
+          element={
+            <PrivateRoute>
               <BookAppointment />
             </PrivateRoute>
           }
@@ -99,6 +111,15 @@ export default function App() {
           element={
             <AdminRoute>
               <AdminServices />
+            </AdminRoute>
+          }
+        />
+
+        <Route
+          path="/admin/providers"
+          element={
+            <AdminRoute>
+              <AdminProviders />
             </AdminRoute>
           }
         />

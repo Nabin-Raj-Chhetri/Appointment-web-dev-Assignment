@@ -26,8 +26,8 @@ const loginRules = [
 ];
 
 const appointmentRules = [
-  body("serviceId").notEmpty().withMessage("Service is required").isInt().withMessage("Invalid service ID"),
   body("providerId").notEmpty().withMessage("Provider is required").isInt().withMessage("Invalid provider ID"),
+
   body("appointmentDate")
     .notEmpty()
     .withMessage("Appointment date is required")
@@ -39,6 +39,7 @@ const appointmentRules = [
       }
       return true;
     }),
+
   body("notes").optional().isLength({ max: 500 }).withMessage("Notes cannot exceed 500 characters"),
 ];
 

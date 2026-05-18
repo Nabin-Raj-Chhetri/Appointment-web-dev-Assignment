@@ -3,6 +3,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 const { connectDB } = require("./config/db");
 require("dotenv").config();
+
 // Must import models/index.js so associations are registered
 require("./models");
 
@@ -12,9 +13,9 @@ dotenv.config();
 connectDB();
 
 const app = express();
+app.use(cors());
 
 // ── Middleware ──────────────────────────────────────────────
-app.use(cors({ origin: "http://localhost:5173" }));
 app.use(express.json());
 
 // ── Routes ─────────────────────────────────────────────────

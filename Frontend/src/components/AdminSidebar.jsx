@@ -14,6 +14,10 @@ export default function AdminSidebar() {
           Appointments
         </Link>
 
+        <Link className="p-3 rounded-lg hover:bg-teal-700" to="/admin/providers">
+          Providers
+        </Link>
+
         <Link className="p-3 rounded-lg hover:bg-teal-700" to="/admin/services">
           Services
         </Link>

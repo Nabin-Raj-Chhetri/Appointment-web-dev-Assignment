@@ -1,12 +1,21 @@
-// ── service.routes.js ───────────────────────────────────────
 const express = require("express");
 const sRouter = express.Router();
-const { getServices, getService } = require("../controllers/service.controller");
+
+const {
+  getServices,
+  getService,
+  createService,
+  updateService,
+  deleteService,
+} = require("../controllers/service.controller");
+
+// Public/patient routes
 sRouter.get("/", getServices);
 sRouter.get("/:id", getService);
-module.exports = sRouter;
 
-// NOTE: Save the sections below as separate files:
-// routes/provider.routes.js
-// routes/appointment.routes.js
-// routes/admin.routes.js
+// Admin CRUD routes
+sRouter.post("/", createService);
+sRouter.put("/:id", updateService);
+sRouter.delete("/:id", deleteService);
+
+module.exports = sRouter;

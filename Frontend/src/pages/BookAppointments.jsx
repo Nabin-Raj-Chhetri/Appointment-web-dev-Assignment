@@ -42,8 +42,29 @@ export default function BookAppointment() {
     }
   };
 
+  const getSelectedDay = () => {
+    if (!form.appointmentDate) return "";
+
+    return new Date(form.appointmentDate).toLocaleDateString("en-US", {
+      weekday: "long",
+    });
+  };
+
+  const isAvailableDay = () => {
+    if (!form.appointmentDate) return true;
+
+    return getAvailableDays().includes(getSelectedDay());
+  };
+
   const submit = async (e) => {
     e.preventDefault();
+
+    if (!isAvailableDay()) {
+      setMessage(
+        `This provider is not available on ${getSelectedDay()}. Please choose: ${getAvailableDays().join(", ")}.`,
+      );
+      return;
+    }
 
     try {
       await API.post("/appointments", form);
@@ -98,9 +119,18 @@ export default function BookAppointment() {
                   appointmentDate: e.target.value,
                 })
               }
-              className="w-full border border-slate-300 rounded-xl px-4 py-3"
+              className={`w-full border rounded-xl px-4 py-3 ${
+                form.appointmentDate && !isAvailableDay() ? "border-red-500" : "border-slate-300"
+              }`}
               required
             />
+
+            {form.appointmentDate && (
+              <p className={`text-sm mt-2 ${isAvailableDay() ? "text-green-600" : "text-red-600"}`}>
+                Selected day: {getSelectedDay()}{" "}
+                {isAvailableDay() ? "is available." : `is not available. Choose: ${getAvailableDays().join(", ")}.`}
+              </p>
+            )}
           </div>
 
           <div>
@@ -121,7 +151,12 @@ export default function BookAppointment() {
 
           <button
             type="submit"
-            className="w-full bg-teal-700 hover:bg-teal-800 text-white font-semibold py-3 rounded-xl transition"
+            disabled={form.appointmentDate && !isAvailableDay()}
+            className={`w-full text-white font-semibold py-3 rounded-xl transition ${
+              form.appointmentDate && !isAvailableDay()
+                ? "bg-slate-400 cursor-not-allowed"
+                : "bg-teal-700 hover:bg-teal-800"
+            }`}
           >
             Confirm Appointment
           </button>

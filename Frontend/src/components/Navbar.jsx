@@ -51,6 +51,9 @@ export default function Navbar() {
                   <Link to="/book" className={navLink}>
                     Book Appointment
                   </Link>
+                  <Link to="/contact" className={navLink}>
+                    Contact
+                  </Link>
                 </>
               )}
 
@@ -118,6 +121,9 @@ export default function Navbar() {
                   </Link>
                   <Link to="/book" className={navLink}>
                     Book Appointment
+                  </Link>
+                  <Link to="/contact" className={navLink}>
+                    Contact
                   </Link>
                 </>
               )}

@@ -13,6 +13,8 @@ import AdminServices from "./pages/AdminServices";
 import AdminContacts from "./pages/AdminContacts";
 import AdminProviders from "./pages/AdminProviders";
 
+import Contact from "./pages/Contact";
+
 import Profile from "./pages/Profile";
 
 import BookProviders from "./pages/BookProviders";
@@ -77,6 +79,15 @@ export default function App() {
           element={
             <PrivateRoute>
               <BookProviders />
+            </PrivateRoute>
+          }
+        />
+
+        <Route
+          path="/contact"
+          element={
+            <PrivateRoute>
+              <Contact />
             </PrivateRoute>
           }
         />

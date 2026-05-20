@@ -6,6 +6,7 @@ const User = require("./User");
 const Service = require("./Service");
 const Provider = require("./Provider");
 const Appointment = require("./Appointment");
+const Contact = require("./Contact");
 
 // ── Associations ────────────────────────────────────────────
 
@@ -21,4 +22,8 @@ Appointment.belongsTo(Service, { foreignKey: "serviceId", as: "service" });
 Provider.hasMany(Appointment, { foreignKey: "providerId", as: "appointments" });
 Appointment.belongsTo(Provider, { foreignKey: "providerId", as: "provider" });
 
-module.exports = { User, Service, Provider, Appointment };
+// A Contact has one User
+Contact.belongsTo(User, { foreignKey: "userId", as: "user" });
+User.hasOne(Contact, { foreignKey: "userId", as: "contact" });
+
+module.exports = { User, Service, Provider, Appointment, Contact };

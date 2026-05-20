@@ -24,10 +24,11 @@ app.use("/api/services", require("./routes/service.routes"));
 app.use("/api/providers", require("./routes/provider.routes"));
 app.use("/api/appointments", require("./routes/appointment.routes"));
 app.use("/api/admin", require("./routes/admin.routes"));
+app.use("/api/contact", require("./routes/contact.routes"));
 
 // ── Health Check ────────────────────────────────────────────
 app.get("/", (req, res) => {
-  res.json({ message: "Health Booking API is running ✅" });
+  res.json({ message: "Health Booking API is running " });
 });
 
 // ── Global Error Handler ────────────────────────────────────

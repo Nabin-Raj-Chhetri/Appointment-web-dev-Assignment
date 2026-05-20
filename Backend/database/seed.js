@@ -101,7 +101,7 @@ const seed = async () => {
     console.log("─────────────────────────────────────────");
     process.exit(0);
   } catch (error) {
-    console.error("❌ Seed failed:", error.message);
+    console.error(" Seed failed:", error.message);
     process.exit(1);
   }
 };

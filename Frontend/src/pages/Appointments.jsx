@@ -3,6 +3,7 @@ import API from "../api";
 
 export default function Appointments() {
   const [appointments, setAppointments] = useState([]);
+  const [message, setMessage] = useState("");
 
   const loadAppointments = async () => {
     const res = await API.get("/appointments");
@@ -12,6 +13,18 @@ export default function Appointments() {
   useEffect(() => {
     loadAppointments();
   }, []);
+
+  const cancelAppointment = async (id) => {
+    if (!confirm("Are you sure you want to cancel this appointment?")) return;
+
+    try {
+      await API.put(`/appointments/${id}`);
+      setMessage("Appointment cancelled successfully.");
+      loadAppointments();
+    } catch (error) {
+      setMessage(error.response?.data?.message || "Failed to cancel appointment.");
+    }
+  };
 
   const statusStyle = {
     pending: "bg-yellow-100 text-yellow-700",
@@ -27,6 +40,8 @@ export default function Appointments() {
           <h1 className="text-4xl font-bold text-slate-800">My Appointments</h1>
           <p className="text-slate-500 mt-2">View your appointment requests and current status.</p>
         </div>
+
+        {message && <div className="bg-white rounded-2xl shadow p-4 text-slate-700 font-semibold">{message}</div>}
 
         {appointments.length === 0 ? (
           <div className="bg-white rounded-3xl shadow p-10 text-center">
@@ -73,6 +88,15 @@ export default function Appointments() {
                     {a.status === "pending" ? "Waiting for admin approval" : a.status}
                   </p>
                 </div>
+
+                {["pending", "confirmed"].includes(a.status) && (
+                  <button
+                    onClick={() => cancelAppointment(a.id)}
+                    className="mt-5 bg-red-600 text-white px-5 py-3 rounded-xl font-semibold hover:bg-red-700 transition"
+                  >
+                    Cancel Appointment
+                  </button>
+                )}
               </div>
             ))}
           </div>

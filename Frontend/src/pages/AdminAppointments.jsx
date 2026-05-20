@@ -109,12 +109,21 @@ export default function AdminAppointments() {
                   )}
 
                   {a.status === "confirmed" && (
-                    <button
-                      onClick={() => updateStatus(a.id, "completed")}
-                      className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
-                    >
-                      Mark Completed
-                    </button>
+                    <>
+                      <button
+                        onClick={() => updateStatus(a.id, "completed")}
+                        className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
+                      >
+                        Mark Completed
+                      </button>
+
+                      <button
+                        onClick={() => updateStatus(a.id, "cancelled")}
+                        className="bg-red-600 text-white px-4 py-2 rounded-lg hover:bg-red-700"
+                      >
+                        Cancel Appointment
+                      </button>
+                    </>
                   )}
 
                   {["cancelled", "completed"].includes(a.status) && (

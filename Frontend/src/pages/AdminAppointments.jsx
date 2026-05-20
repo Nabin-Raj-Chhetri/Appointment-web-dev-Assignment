@@ -42,7 +42,9 @@ export default function AdminAppointments() {
             <button
               key={item}
               onClick={() => setFilter(item)}
-              className={`px-5 py-2 rounded-lg font-semibold ${
+              aria-label={`Filter appointments by ${item} status`}
+              aria-pressed={filter === item}
+              className={`px-5 py-2 rounded-lg font-semibold transition focus:outline-none focus:ring-2 focus:ring-teal-500 ${
                 filter === item ? "bg-teal-700 text-white" : "bg-white text-slate-700 hover:bg-slate-100"
               }`}
             >
@@ -59,11 +61,11 @@ export default function AdminAppointments() {
         ) : (
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
             {filteredAppointments.map((a) => (
-              <div key={a._id || a.id} className="bg-white rounded-2xl shadow p-6 border border-slate-100">
+              <div key={a.id || a.id} className="bg-white rounded-2xl shadow p-6 border border-slate-100">
                 <div className="flex justify-between gap-4 mb-4">
                   <div>
                     <h2 className="text-xl font-bold text-slate-800">{a.service?.name || "Appointment"}</h2>
-                    <p className="text-sm text-slate-500">Patient: {a.patient?.name || "Unknown"}</p>
+                    <p className="text-sm text-slate-500">Patient: {a.user?.name || "Unknown"}</p>
                   </div>
 
                   <span
@@ -77,7 +79,7 @@ export default function AdminAppointments() {
 
                 <div className="space-y-2 text-slate-700">
                   <p>
-                    <b>Email:</b> {a.patient?.email || "N/A"}
+                    <b>Email:</b> {a.user?.email || "N/A"}
                   </p>
                   <p>
                     <b>Provider:</b> {a.provider?.name || "N/A"}
@@ -108,7 +110,7 @@ export default function AdminAppointments() {
 
                   {a.status === "confirmed" && (
                     <button
-                      onClick={() => updateStatus(a._id, "completed")}
+                      onClick={() => updateStatus(a.id, "completed")}
                       className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700"
                     >
                       Mark Completed

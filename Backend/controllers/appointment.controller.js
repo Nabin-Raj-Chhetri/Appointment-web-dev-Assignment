@@ -128,7 +128,7 @@ const getAllAppointments = async (req, res) => {
 const updateAppointmentStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    if (!["pending", "confirmed", "cancelled"].includes(status)) {
+    if (!["pending", "confirmed", "cancelled", "completed"].includes(status)) {
       return res.status(400).json({ message: "Invalid status value" });
     }
 
@@ -147,6 +147,43 @@ const updateAppointmentStatus = async (req, res) => {
   }
 };
 
+// GET /api/appointments/provider/:providerId/booked-slots?date=YYYY-MM-DD
+const getBookedSlotsByProvider = async (req, res) => {
+  try {
+    const { providerId } = req.params;
+    const { date } = req.query;
+
+    if (!providerId || !date) {
+      return res.status(400).json({ message: "Provider ID and date are required" });
+    }
+
+    const startOfDay = new Date(`${date}T00:00:00`);
+    const endOfDay = new Date(`${date}T23:59:59`);
+
+    const appointments = await Appointment.findAll({
+      where: {
+        providerId,
+        appointmentDate: {
+          [Op.between]: [startOfDay, endOfDay],
+        },
+        status: {
+          [Op.ne]: "cancelled",
+        },
+      },
+      attributes: ["appointmentDate"],
+    });
+
+    const bookedSlots = appointments.map((item) => {
+      const d = new Date(item.appointmentDate);
+      return d.toTimeString().slice(0, 5);
+    });
+
+    res.json(bookedSlots);
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
 module.exports = {
   getMyAppointments,
   getAppointment,
@@ -155,4 +192,5 @@ module.exports = {
   deleteAppointment,
   getAllAppointments,
   updateAppointmentStatus,
+  getBookedSlotsByProvider,
 };

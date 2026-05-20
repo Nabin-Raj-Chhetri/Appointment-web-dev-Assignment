@@ -2,22 +2,43 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import API from "../api";
 
+const TIME_SLOTS = [
+  "09:00",
+  "09:30",
+  "10:00",
+  "10:30",
+  "11:00",
+  "11:30",
+  "13:00",
+  "13:30",
+  "14:00",
+  "14:30",
+  "15:00",
+  "15:30",
+  "16:00",
+];
+
 export default function BookAppointment() {
   const { providerId } = useParams();
 
   const [provider, setProvider] = useState(null);
-
-  const [form, setForm] = useState({
-    providerId: providerId,
-    appointmentDate: "",
-    notes: "",
-  });
-
+  const [selectedDate, setSelectedDate] = useState("");
+  const [selectedTime, setSelectedTime] = useState("");
+  const [bookedSlots, setBookedSlots] = useState([]);
+  const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   useEffect(() => {
     loadProvider();
   }, []);
+
+  useEffect(() => {
+    if (selectedDate) {
+      loadBookedSlots();
+      setSelectedTime("");
+    }
+  }, [selectedDate]);
 
   const loadProvider = async () => {
     try {
@@ -25,6 +46,21 @@ export default function BookAppointment() {
       setProvider(res.data);
     } catch (err) {
       console.log(err);
+    }
+  };
+
+  const loadBookedSlots = async () => {
+    try {
+      setLoadingSlots(true);
+
+      const res = await API.get(`/appointments/provider/${providerId}/booked-slots?date=${selectedDate}`);
+
+      setBookedSlots(res.data || []);
+    } catch (err) {
+      console.log(err);
+      setBookedSlots([]);
+    } finally {
+      setLoadingSlots(false);
     }
   };
 
@@ -43,21 +79,37 @@ export default function BookAppointment() {
   };
 
   const getSelectedDay = () => {
-    if (!form.appointmentDate) return "";
+    if (!selectedDate) return "";
 
-    return new Date(form.appointmentDate).toLocaleDateString("en-US", {
+    return new Date(`${selectedDate}T00:00:00`).toLocaleDateString("en-US", {
       weekday: "long",
     });
   };
 
   const isAvailableDay = () => {
-    if (!form.appointmentDate) return true;
-
+    if (!selectedDate) return true;
     return getAvailableDays().includes(getSelectedDay());
+  };
+
+  const isPastSlot = (time) => {
+    if (!selectedDate) return false;
+
+    const slotDateTime = new Date(`${selectedDate}T${time}`);
+    return slotDateTime <= new Date();
+  };
+
+  const isBooked = (time) => {
+    return bookedSlots.includes(time);
   };
 
   const submit = async (e) => {
     e.preventDefault();
+    setMessage("");
+
+    if (!selectedDate || !selectedTime) {
+      setMessage("Please select appointment date and time.");
+      return;
+    }
 
     if (!isAvailableDay()) {
       setMessage(
@@ -66,16 +118,27 @@ export default function BookAppointment() {
       return;
     }
 
+    if (isBooked(selectedTime)) {
+      setMessage("This time slot is already booked. Please choose another.");
+      return;
+    }
+
+    if (isPastSlot(selectedTime)) {
+      setMessage("Appointment time must be in the future.");
+      return;
+    }
+
     try {
-      await API.post("/appointments", form);
-
-      setMessage("Appointment booked successfully");
-
-      setForm({
-        providerId: providerId,
-        appointmentDate: "",
-        notes: "",
+      await API.post("/appointments", {
+        providerId,
+        appointmentDate: `${selectedDate}T${selectedTime}`,
+        notes,
       });
+
+      setMessage("Appointment booked successfully.");
+      setSelectedTime("");
+      setNotes("");
+      loadBookedSlots();
     } catch (err) {
       setMessage(err.response?.data?.message || "Booking failed");
     }
@@ -83,7 +146,7 @@ export default function BookAppointment() {
 
   return (
     <div className="min-h-screen bg-slate-100 py-10 px-6">
-      <div className="max-w-2xl mx-auto bg-white rounded-3xl shadow-xl p-8">
+      <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-8">
         <h1 className="text-3xl font-bold text-slate-800 mb-6">Book Appointment</h1>
 
         {provider && (
@@ -95,8 +158,8 @@ export default function BookAppointment() {
             <p className="mt-3 text-sm text-slate-500">Available Days:</p>
 
             <div className="flex flex-wrap gap-2 mt-2">
-              {getAvailableDays().map((day, index) => (
-                <span key={index} className="bg-teal-600 text-white px-3 py-1 rounded-full text-sm">
+              {getAvailableDays().map((day) => (
+                <span key={day} className="bg-teal-600 text-white px-3 py-1 rounded-full text-sm">
                   {day}
                 </span>
               ))}
@@ -106,26 +169,22 @@ export default function BookAppointment() {
 
         {message && <div className="bg-slate-100 rounded-xl p-3 mb-4 text-slate-700">{message}</div>}
 
-        <form onSubmit={submit} className="space-y-5">
+        <form onSubmit={submit} className="space-y-6">
           <div>
-            <label className="block mb-2 font-semibold text-slate-700">Appointment Date & Time</label>
+            <label className="block mb-2 font-semibold text-slate-700">Appointment Date</label>
 
             <input
-              type="datetime-local"
-              value={form.appointmentDate}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  appointmentDate: e.target.value,
-                })
-              }
+              type="date"
+              value={selectedDate}
+              min={new Date().toISOString().split("T")[0]}
+              onChange={(e) => setSelectedDate(e.target.value)}
               className={`w-full border rounded-xl px-4 py-3 ${
-                form.appointmentDate && !isAvailableDay() ? "border-red-500" : "border-slate-300"
+                selectedDate && !isAvailableDay() ? "border-red-500" : "border-slate-300"
               }`}
               required
             />
 
-            {form.appointmentDate && (
+            {selectedDate && (
               <p className={`text-sm mt-2 ${isAvailableDay() ? "text-green-600" : "text-red-600"}`}>
                 Selected day: {getSelectedDay()}{" "}
                 {isAvailableDay() ? "is available." : `is not available. Choose: ${getAvailableDays().join(", ")}.`}
@@ -134,16 +193,46 @@ export default function BookAppointment() {
           </div>
 
           <div>
+            <label className="block mb-3 font-semibold text-slate-700">Available Time Slots</label>
+
+            {!selectedDate ? (
+              <p className="text-slate-500">Select a date first.</p>
+            ) : loadingSlots ? (
+              <p className="text-slate-500">Loading time slots...</p>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {TIME_SLOTS.map((time) => {
+                  const disabled = !isAvailableDay() || isBooked(time) || isPastSlot(time);
+
+                  return (
+                    <button
+                      key={time}
+                      type="button"
+                      disabled={disabled}
+                      onClick={() => setSelectedTime(time)}
+                      className={`rounded-xl px-4 py-3 font-semibold border transition ${
+                        selectedTime === time
+                          ? "bg-teal-700 text-white border-teal-700"
+                          : disabled
+                            ? "bg-slate-200 text-slate-400 border-slate-200 cursor-not-allowed"
+                            : "bg-white text-slate-700 border-slate-300 hover:bg-teal-50 hover:border-teal-600"
+                      }`}
+                    >
+                      {time}
+                      {isBooked(time) && <span className="block text-xs mt-1">Booked</span>}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
+
+          <div>
             <label className="block mb-2 font-semibold text-slate-700">Notes</label>
 
             <textarea
-              value={form.notes}
-              onChange={(e) =>
-                setForm({
-                  ...form,
-                  notes: e.target.value,
-                })
-              }
+              value={notes}
+              onChange={(e) => setNotes(e.target.value)}
               className="w-full border border-slate-300 rounded-xl px-4 py-3 min-h-[120px]"
               placeholder="Describe your issue..."
             />
@@ -151,9 +240,9 @@ export default function BookAppointment() {
 
           <button
             type="submit"
-            disabled={form.appointmentDate && !isAvailableDay()}
+            disabled={!selectedDate || !selectedTime || !isAvailableDay()}
             className={`w-full text-white font-semibold py-3 rounded-xl transition ${
-              form.appointmentDate && !isAvailableDay()
+              !selectedDate || !selectedTime || !isAvailableDay()
                 ? "bg-slate-400 cursor-not-allowed"
                 : "bg-teal-700 hover:bg-teal-800"
             }`}

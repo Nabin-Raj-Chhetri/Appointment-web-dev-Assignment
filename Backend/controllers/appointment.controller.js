@@ -4,7 +4,7 @@ const { Appointment, Service, Provider, User } = require("../models");
 // Reusable include config for joins
 const appointmentIncludes = [{ model: Provider, as: "provider", attributes: ["id", "name", "specialisation"] }];
 
-// ── GET /api/appointments ───────────────────────────────────
+// Get Appoiuntments
 const getMyAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.findAll({
@@ -18,7 +18,7 @@ const getMyAppointments = async (req, res) => {
   }
 };
 
-// ── GET /api/appointments/:id ───────────────────────────────
+// Get single appountment
 const getAppointment = async (req, res) => {
   try {
     const appointment = await Appointment.findOne({
@@ -32,7 +32,7 @@ const getAppointment = async (req, res) => {
   }
 };
 
-// ── POST /api/appointments ──────────────────────────────────
+// create appointments
 const createAppointment = async (req, res) => {
   try {
     const { providerId, appointmentDate, notes } = req.body;
@@ -78,7 +78,7 @@ const createAppointment = async (req, res) => {
   }
 };
 
-// ── PUT /api/appointments/:id — patient cancels ─────────────
+// update appointments
 const cancelAppointment = async (req, res) => {
   try {
     const appointment = await Appointment.findOne({
@@ -97,7 +97,7 @@ const cancelAppointment = async (req, res) => {
   }
 };
 
-// ── DELETE /api/appointments/:id ────────────────────────────
+// delete appointments
 const deleteAppointment = async (req, res) => {
   try {
     const appointment = await Appointment.findOne({
@@ -111,7 +111,6 @@ const deleteAppointment = async (req, res) => {
   }
 };
 
-// ── ADMIN: GET /api/admin/appointments ─────────────────────
 const getAllAppointments = async (req, res) => {
   try {
     const appointments = await Appointment.findAll({
@@ -124,7 +123,6 @@ const getAllAppointments = async (req, res) => {
   }
 };
 
-// ── ADMIN: PUT /api/admin/appointments/:id/status ───────────
 const updateAppointmentStatus = async (req, res) => {
   try {
     const { status } = req.body;
@@ -147,7 +145,6 @@ const updateAppointmentStatus = async (req, res) => {
   }
 };
 
-// GET /api/appointments/provider/:providerId/booked-slots?date=YYYY-MM-DD
 const getBookedSlotsByProvider = async (req, res) => {
   try {
     const { providerId } = req.params;

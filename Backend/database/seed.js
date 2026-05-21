@@ -7,7 +7,7 @@ const { User, Service, Provider, Appointment } = require("../models");
 const seed = async () => {
   try {
     await connectDB();
-    console.log("✅ Connected to MySQL");
+    console.log("Connected to MySQL");
 
     // Clear tables
     await sequelize.query("SET FOREIGN_KEY_CHECKS = 0");
@@ -38,7 +38,7 @@ const seed = async () => {
 
     await sequelize.query("SET FOREIGN_KEY_CHECKS = 1");
 
-    console.log("🗑️ Cleared existing data");
+    console.log("Cleared existing data");
 
     // ── Users ──────────────────────────────────────────────
     await User.create({ name: "Admin User", email: "admin@healthbook.com", password: "password123", role: "admin" });
@@ -48,7 +48,7 @@ const seed = async () => {
       password: "password123",
       role: "patient",
     });
-    console.log("👤 Users seeded");
+    console.log(" Users seeded");
 
     // ── Services ───────────────────────────────────────────
     await Service.bulkCreate([
@@ -92,9 +92,9 @@ const seed = async () => {
       { name: "Mr. Tom Wallace", specialisation: "Physiotherapy", availableDays: ["Wednesday", "Thursday", "Friday"] },
       { name: "Ms. Priya Sharma", specialisation: "Dietetics & Nutrition", availableDays: ["Monday", "Friday"] },
     ]);
-    console.log("👨‍⚕️ Providers seeded");
+    console.log("Providers seeded");
 
-    console.log("\n✅ Database seeded successfully!");
+    console.log("\n Database seeded successfully!");
     console.log("─────────────────────────────────────────");
     console.log("Admin:   admin@healthbook.com   / password123");
     console.log("Patient: patient@healthbook.com / password123");

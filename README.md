@@ -87,7 +87,7 @@ Example:
 ```env
 DB_HOST=localhost
 DB_USER=root
-DB_PASSWORD=your_password
+DB_PASSWORD=
 DB_NAME=health_book
 DB_PORT=3306
 ```
@@ -108,7 +108,9 @@ Install dependencies:
 npm install
 ```
 
-
+```bash
+npm run seed
+```
 
 Start backend server:
 

@@ -43,7 +43,7 @@ const seed = async () => {
     // ── Users ──────────────────────────────────────────────
     await User.create({ name: "Admin User", email: "admin@healthbook.com", password: "password123", role: "admin" });
     await User.create({
-      name: "Jane Patient",
+      name: "Nabin Patient",
       email: "patient@healthbook.com",
       password: "password123",
       role: "patient",
@@ -74,7 +74,7 @@ const seed = async () => {
         durationMinutes: 30,
       },
     ]);
-    console.log("🏥 Services seeded");
+    console.log("Services seeded");
 
     // ── Providers ──────────────────────────────────────────
     await Provider.bulkCreate([

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import API from "../api";
 
 const TIME_SLOTS = [
@@ -21,6 +21,8 @@ const TIME_SLOTS = [
 export default function BookAppointment() {
   const { providerId } = useParams();
 
+  const navigate = useNavigate();
+
   const [provider, setProvider] = useState(null);
   const [selectedDate, setSelectedDate] = useState("");
   const [selectedTime, setSelectedTime] = useState("");
@@ -28,6 +30,7 @@ export default function BookAppointment() {
   const [notes, setNotes] = useState("");
   const [message, setMessage] = useState("");
   const [loadingSlots, setLoadingSlots] = useState(false);
+  const [booking, setBooking] = useState(false);
 
   useEffect(() => {
     loadProvider();
@@ -129,18 +132,23 @@ export default function BookAppointment() {
     }
 
     try {
+      setBooking(true);
+
       await API.post("/appointments", {
         providerId,
         appointmentDate: `${selectedDate}T${selectedTime}`,
         notes,
       });
 
-      setMessage("Appointment booked successfully.");
-      setSelectedTime("");
-      setNotes("");
-      loadBookedSlots();
+      setMessage("Appointment confirmed successfully. Redirecting...");
+
+      setTimeout(() => {
+        navigate("/appointments");
+      }, 1200);
     } catch (err) {
       setMessage(err.response?.data?.message || "Booking failed");
+    } finally {
+      setBooking(false);
     }
   };
 
@@ -148,7 +156,6 @@ export default function BookAppointment() {
     <div className="min-h-screen bg-slate-100 py-10 px-6">
       <div className="max-w-3xl mx-auto bg-white rounded-3xl shadow-xl p-8">
         <h1 className="text-3xl font-bold text-slate-800 mb-6">Book Appointment</h1>
-
         {provider && (
           <div className="bg-teal-50 border border-teal-100 rounded-2xl p-5 mb-6">
             <h2 className="text-2xl font-bold text-teal-800">{provider.name}</h2>
@@ -166,9 +173,11 @@ export default function BookAppointment() {
             </div>
           </div>
         )}
-
-        {message && <div className="bg-slate-100 rounded-xl p-3 mb-4 text-slate-700">{message}</div>}
-
+        {message && (
+          <div className="bg-green-100 border border-green-400 text-green-800 font-bold text-center rounded-xl p-4 mb-4 shadow-md">
+            {message}
+          </div>
+        )}{" "}
         <form onSubmit={submit} className="space-y-6">
           <div>
             <label className="block mb-2 font-semibold text-slate-700">Appointment Date</label>
@@ -208,6 +217,7 @@ export default function BookAppointment() {
                     <button
                       key={time}
                       type="button"
+                      aria-label="Confirm appointment booking"
                       disabled={disabled}
                       onClick={() => setSelectedTime(time)}
                       className={`rounded-xl px-4 py-3 font-semibold border transition ${
@@ -232,6 +242,7 @@ export default function BookAppointment() {
 
             <textarea
               value={notes}
+              aria-label="Appointment notes"
               onChange={(e) => setNotes(e.target.value)}
               className="w-full border border-slate-300 rounded-xl px-4 py-3 min-h-[120px]"
               placeholder="Describe your issue..."
@@ -240,14 +251,14 @@ export default function BookAppointment() {
 
           <button
             type="submit"
-            disabled={!selectedDate || !selectedTime || !isAvailableDay()}
+            disabled={booking || !selectedDate || !selectedTime || !isAvailableDay()}
             className={`w-full text-white font-semibold py-3 rounded-xl transition ${
-              !selectedDate || !selectedTime || !isAvailableDay()
+              booking || !selectedDate || !selectedTime || !isAvailableDay()
                 ? "bg-slate-400 cursor-not-allowed"
                 : "bg-teal-700 hover:bg-teal-800"
             }`}
           >
-            Confirm Appointment
+            {booking ? "Confirming..." : "Confirm Appointment"}
           </button>
         </form>
       </div>

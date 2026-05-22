@@ -91,6 +91,7 @@ export default function Appointments() {
 
                 {["pending", "confirmed"].includes(a.status) && (
                   <button
+                    aria-label={`Cancel appointment with provider ${a.provider?.name || "N/A"}`}
                     onClick={() => cancelAppointment(a.id)}
                     className="mt-5 bg-red-600 text-white px-5 py-3 rounded-xl font-semibold hover:bg-red-700 transition"
                   >
